@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:tradeable/abstract/extensions.dart';
+import 'package:tradeable/sound.dart';
 
 import 'game.dart';
 
@@ -25,9 +27,10 @@ class GameScreen extends StatefulWidget {
 }
 
 class _GameScreenState extends State<GameScreen> {
-  final MarbleGame game = MarbleGame();
+  MarbleGame game = MarbleGame();
 
   void _handleTap(int row, int col) {
+    GameSound.onTap();
     if (!game.gameWon && game.placeMarble(row, col)) {
       setState(() {});
     }
@@ -37,16 +40,19 @@ class _GameScreenState extends State<GameScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Two-Player Marble Game"),
+        centerTitle: true,
+        title: const Text("Two - Player Marble Game"),
       ),
       body: Column(
         children: [
-          Text('${game.currentPlayer} turn'),
+          Text('${game.currentPlayer.name} turn'),
+          40.vGap,
           Expanded(
             child: GridView.builder(
               gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                 crossAxisCount: 4,
               ),
+              padding: const EdgeInsets.all(18),
               itemCount: 16,
               itemBuilder: (context, index) {
                 int row = index ~/ 4;
@@ -58,7 +64,7 @@ class _GameScreenState extends State<GameScreen> {
                     color: game.board[row][col] == Player.player1
                         ? Colors.blue
                         : game.board[row][col] == Player.player2
-                            ? Colors.red
+                            ? Colors.yellow
                             : Colors.grey[300],
                     child: Center(
                       child: Text(
@@ -79,13 +85,23 @@ class _GameScreenState extends State<GameScreen> {
             ),
           ),
           if (game.gameWon)
+            ElevatedButton(
+              onPressed: () {
+                setState(() {
+                  game = MarbleGame();
+                });
+              },
+              child: const Text('Re play'),
+            ),
+          if (game.gameWon)
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                "Player ${game.currentPlayer == Player.player1 ? "1" : "2"} Wins!",
+                "${game.playerWon.name} Wins!",
                 style: const TextStyle(fontSize: 24, color: Colors.green),
               ),
             ),
+          20.0.vGap,
         ],
       ),
     );

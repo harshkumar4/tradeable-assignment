@@ -1,4 +1,6 @@
+import 'package:flame_audio/flame_audio.dart';
 import 'package:flutter/material.dart';
+import 'package:tradeable/sound.dart';
 import 'package:tradeable/ui.dart';
 
 void main() {
@@ -10,6 +12,8 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    FlameAudio.bgm.stop().then((value) => GameSound.playBg());
+
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
