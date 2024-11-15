@@ -5,21 +5,6 @@ import 'package:tradeable/widgets/win_confetti.dart';
 
 import 'game.dart';
 
-void main() {
-  runApp(const MarbleGameApp());
-}
-
-class MarbleGameApp extends StatelessWidget {
-  const MarbleGameApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const MaterialApp(
-      home: GameScreen(),
-    );
-  }
-}
-
 class GameScreen extends StatefulWidget {
   const GameScreen({super.key});
 
@@ -33,7 +18,14 @@ class _GameScreenState extends State<GameScreen> {
   @override
   void initState() {
     super.initState();
-    game = MarbleGame(setState);
+    init();
+  }
+
+  void init() {
+    game = MarbleGame();
+    game.addListener(() {
+      setState(() {});
+    });
   }
 
   void _handleTap(int row, int col) {
@@ -67,7 +59,6 @@ class _GameScreenState extends State<GameScreen> {
                       value:
                           ((game.currentPlayerRemainingTime?.toDouble() ?? 0) /
                               30.0),
-                      // color: Colors.orange,
                       backgroundColor: Colors.white,
                       valueColor: AlwaysStoppedAnimation<Color>(Colors.orange),
                     ),
@@ -88,22 +79,22 @@ class _GameScreenState extends State<GameScreen> {
               itemBuilder: (context, index) {
                 int row = index ~/ 4;
                 int col = index % 4;
+
+                final player = game.board[row][col];
                 return GestureDetector(
                   onTap: () => _handleTap(row, col),
                   child: Container(
                     margin: const EdgeInsets.all(4),
-                    color: game.board[row][col] == Player.player1
+                    color: player == Player.player1
                         ? Colors.blue
-                        : game.board[row][col] == Player.player2
+                        : player == Player.player2
                             ? Colors.yellow
                             : Colors.grey[300],
                     child: Center(
                       child: Text(
-                        game.board[row][col] == Player.none
+                        player == Player.none
                             ? ""
-                            : (game.board[row][col] == Player.player1
-                                ? "P1"
-                                : "P2"),
+                            : (player == Player.player1 ? "P1" : "P2"),
                         style: const TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -119,7 +110,7 @@ class _GameScreenState extends State<GameScreen> {
             ElevatedButton(
               onPressed: () {
                 setState(() {
-                  game = MarbleGame(setState);
+                  init();
                 });
               },
               child: const Text('Re play'),

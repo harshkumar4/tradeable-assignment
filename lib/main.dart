@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
     GameSound.playBg();
 
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Marble Game',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,

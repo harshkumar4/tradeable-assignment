@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:tradeable/sound.dart';
 import 'package:tradeable/utils/stopwatch.dart';
 
@@ -7,41 +8,40 @@ extension Name on Player {
   String get name => Player.player1 == this ? 'Player 1' : 'Player 2';
 }
 
-class MarbleGame {
+class MarbleGame extends ChangeNotifier {
   late List<List<Player>> board;
   late Player currentPlayer;
   late bool gameWon;
   late Player playerWon;
+  late int? currentPlayerRemainingTime;
+
   late CustomStopwatch stopwatch;
-  int? currentPlayerRemainingTime;
-  late void Function(void Function()) stateUpdate;
 
-  final int maxPlayerTime = 30;
+  late final int maxPlayerTime;
 
-  MarbleGame(void Function(void Function()) stateUpdates) {
+  MarbleGame() {
     board = List.generate(4, (_) => List.generate(4, (_) => Player.none));
     currentPlayer = Player.player1;
     gameWon = false;
-    stateUpdate = stateUpdates;
-  }
-
-  void _startTimer() {
+    maxPlayerTime = 30;
+    currentPlayerRemainingTime = null;
     stopwatch = CustomStopwatch(
       totalIterations: maxPlayerTime,
       onTick: (p0) {
         currentPlayerRemainingTime = maxPlayerTime - p0;
-        stateUpdate(
-          () {},
-        );
+        notifyListeners();
+
         GameSound.onTick();
       },
       onComplete: () {
         _switchTurn();
-        stateUpdate(
-          () {},
-        );
+        notifyListeners();
       },
     );
+  }
+
+  void _startTimer() {
+    stopwatch.startTimer();
   }
 
   void _switchTurn() {
@@ -118,31 +118,6 @@ class MarbleGame {
 
     board = newBoard;
   }
-
-  // bool checkWinCondition(int row, int col) {
-  //   return checkLine(row, col, 1, 0) || // Horizontal
-  //       checkLine(row, col, 0, 1) || // Vertical
-  //       checkLine(row, col, 1, 1) || // Diagonal
-  //       checkLine(row, col, 1, -1); // Anti-diagonal
-  // }
-
-  // bool checkLine(int row, int col, int dRow, int dCol) {
-  //   Player p = board[row][col];
-  //   int count = 1;
-  //   for (int i = 1; i < 4; i++) {
-  //     int r = row + dRow * i;
-  //     int c = col + dCol * i;
-  //     if (r < 0 || r >= 4 || c < 0 || c >= 4 || board[r][c] != p) break;
-  //     count++;
-  //   }
-  //   for (int i = 1; i < 4; i++) {
-  //     int r = row - dRow * i;
-  //     int c = col - dCol * i;
-  //     if (r < 0 || r >= 4 || c < 0 || c >= 4 || board[r][c] != p) break;
-  //     count++;
-  //   }
-  //   return count >= 4;
-  // }
 
   bool checkWin() {
     for (int i = 0; i < 4; i++) {

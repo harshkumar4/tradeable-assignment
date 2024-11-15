@@ -19,10 +19,10 @@ class CustomStopwatch {
     _onComplete = onComplete;
     _currentIteration = 0;
     _duration = duration;
-    _startTimer();
+    // _startTimer();
   }
 
-  void _startTimer() {
+  void startTimer() {
     _timer =
         Timer.periodic(_duration ?? const Duration(seconds: 1), (Timer timer) {
       _currentIteration++;
@@ -41,7 +41,7 @@ class CustomStopwatch {
       _timer.cancel();
     }
     _currentIteration = 0;
-    _startTimer();
+    startTimer();
   }
 
   void cancel() {

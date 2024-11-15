@@ -46,11 +46,11 @@ class _WinConfettiWidgetState extends State<WinConfettiWidget> {
     final double centerX = size.width / 2;
     final double centerY = size.height / 2;
     final double radius = min(centerX, centerY);
-    final double innerRadius = radius * 0.5; // Adjust inner radius for the star
+    final double innerRadius = radius * 0.5;
 
     const int numPoints = 5;
-    final double angle = (2 * pi) / numPoints;
-    final double rotation = pi / 2; // Rotate the star by 90 degrees
+    const double angle = (2 * pi) / numPoints;
+    const double rotation = pi / 2; // Rotation of the star by 90 degrees
 
     for (int i = 0; i < numPoints * 2; i++) {
       // Determine if it's an outer or inner point
@@ -81,9 +81,6 @@ class _WinConfettiWidgetState extends State<WinConfettiWidget> {
         ConfettiWidget(
           confettiController: _controllerCenter,
           blastDirectionality: BlastDirectionality.explosive,
-          // don't specify a direction, blast randomly
-          // shouldLoop: true,
-          // start again as soon as the animation is finished
           colors: const [
             Colors.green,
             Colors.blue,
@@ -91,7 +88,7 @@ class _WinConfettiWidgetState extends State<WinConfettiWidget> {
             Colors.orange,
             Colors.purple
           ],
-          createParticlePath: createStarPath, // define a custom shape/path.
+          createParticlePath: createStarPath,
           strokeWidth: 8,
           strokeColor: Colors.yellowAccent,
         ),
