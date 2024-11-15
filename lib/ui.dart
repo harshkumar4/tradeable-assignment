@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:tradeable/abstract/extensions.dart';
 import 'package:tradeable/sound.dart';
+import 'package:tradeable/widgets/win_confetti.dart';
 
 import 'game.dart';
 
@@ -27,7 +28,13 @@ class GameScreen extends StatefulWidget {
 }
 
 class _GameScreenState extends State<GameScreen> {
-  MarbleGame game = MarbleGame();
+  late MarbleGame game;
+
+  @override
+  void initState() {
+    super.initState();
+    game = MarbleGame(setState);
+  }
 
   void _handleTap(int row, int col) {
     GameSound.onTap();
@@ -45,7 +52,31 @@ class _GameScreenState extends State<GameScreen> {
       ),
       body: Column(
         children: [
-          Text('${game.currentPlayer.name} turn'),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 18.0, vertical: 4),
+            child: Row(
+              children: [
+                Text(
+                  '${game.currentPlayer.name}',
+                ),
+                Spacer(),
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    CircularProgressIndicator(
+                      value:
+                          ((game.currentPlayerRemainingTime?.toDouble() ?? 0) /
+                              30.0),
+                      // color: Colors.orange,
+                      backgroundColor: Colors.white,
+                      valueColor: AlwaysStoppedAnimation<Color>(Colors.orange),
+                    ),
+                    Text('${game.currentPlayerRemainingTime ?? 30}'),
+                  ],
+                )
+              ],
+            ),
+          ),
           40.vGap,
           Expanded(
             child: GridView.builder(
@@ -88,17 +119,19 @@ class _GameScreenState extends State<GameScreen> {
             ElevatedButton(
               onPressed: () {
                 setState(() {
-                  game = MarbleGame();
+                  game = MarbleGame(setState);
                 });
               },
               child: const Text('Re play'),
             ),
           if (game.gameWon)
-            Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Text(
-                "${game.playerWon.name} Wins!",
-                style: const TextStyle(fontSize: 24, color: Colors.green),
+            WinConfettiWidget(
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(
+                  "${game.playerWon.name} Wins!",
+                  style: const TextStyle(fontSize: 24, color: Colors.green),
+                ),
               ),
             ),
           20.0.vGap,

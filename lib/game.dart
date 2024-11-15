@@ -1,4 +1,5 @@
 import 'package:tradeable/sound.dart';
+import 'package:tradeable/utils/stopwatch.dart';
 
 enum Player { player1, player2, none }
 
@@ -11,22 +12,67 @@ class MarbleGame {
   late Player currentPlayer;
   late bool gameWon;
   late Player playerWon;
+  late CustomStopwatch stopwatch;
+  int? currentPlayerRemainingTime;
+  late void Function(void Function()) stateUpdate;
 
-  MarbleGame() {
+  final int maxPlayerTime = 30;
+
+  MarbleGame(void Function(void Function()) stateUpdates) {
     board = List.generate(4, (_) => List.generate(4, (_) => Player.none));
     currentPlayer = Player.player1;
     gameWon = false;
+    stateUpdate = stateUpdates;
+  }
+
+  void _startTimer() {
+    stopwatch = CustomStopwatch(
+      totalIterations: maxPlayerTime,
+      onTick: (p0) {
+        currentPlayerRemainingTime = maxPlayerTime - p0;
+        stateUpdate(
+          () {},
+        );
+        GameSound.onTick();
+      },
+      onComplete: () {
+        _switchTurn();
+        stateUpdate(
+          () {},
+        );
+      },
+    );
+  }
+
+  void _switchTurn() {
+    moveMarblesCounterclockwise();
+    if (checkWin()) {
+      gameWon = true;
+      stopwatch.cancel();
+      return;
+    }
+
+    switchPlayer();
+    currentPlayerRemainingTime = maxPlayerTime;
+    stopwatch.restart();
   }
 
   bool placeMarble(int row, int col) {
+    if (currentPlayerRemainingTime == null) {
+      _startTimer();
+    }
     if (board[row][col] == Player.none) {
       board[row][col] = currentPlayer;
       moveMarblesCounterclockwise();
       if (checkWin()) {
         gameWon = true;
+        stopwatch.cancel();
         return true;
       }
+
       switchPlayer();
+      currentPlayerRemainingTime = maxPlayerTime;
+      stopwatch.restart();
       return true;
     }
     return false;
